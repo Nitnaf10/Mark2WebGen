@@ -65,6 +65,7 @@ section{
 }
 
 #HtmlOutput {
+  all: unset;
   font-family: Arial;
   grid-area: HtmlOutput;
   background: var(--white-color);
