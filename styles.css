@@ -152,11 +152,11 @@ footer {
 
 header img,
 footer img {
-  max-height: 100px
+  max-width: 5vw;
 }
 
 header {
-  font-size: 100px;
+  font-size: 7vw;
   text-align: center;
   font-family: "Cairo Play";
   color: white;
