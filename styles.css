@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo+Play:wght@200..1000&display=swap');
+
+:root {
+  --blue: #1976d2;
+  --green: #72bf80;
+  --secondary-color: #e53a35;
+  --background-color: #f4f4f4;
+  --white-color: #fff;
+  --light-gray: #ddd;
+  --medium-gray: #ccc;
+  --text-color: #333;
+  --subtitle-color: #555;
+  --highlight-color: #ffeb3b;
+  --gray-light: #fafafa
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--background-color);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color)
+}
+
+h1,
+h2,
+strong {
+  font-family: "Cairo Play", sans-serif
+}
+
+h1 {
+  margin-top: 40px;
+  font-size: 24px;
+  color: var(--blue)
+}
+
+h2 {
+  color: var(--subtitle-color)
+}
+
+p {
+  margin: 5px 0 15px;
+  font-size: 16px
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas: "MarkdownInput HtmlOutput" "CssInput HtmlCodeOutput";
+  gap: 20px;
+}
+section{
+  max-width: 1200px;
+  margin: 20px auto;
+  background: var(--white-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 20px
+}
+
+#MarkdownInput,
+#CssInput {
+  grid-area: initial
+}
+
+#HtmlOutput {
+  font-family: Arial;
+  grid-area: HtmlOutput;
+  background: var(--white-color);
+  border: 1px solid var(--light-gray);
+  padding: 15px;
+  border-radius: 4px;
+  overflow-y: auto;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#HtmlCodeOutput {
+  grid-area: HtmlCodeOutput;
+  background: var(--gray-light);
+  font-family: monospace
+}
+
+textarea,
+.output {
+  width: 100%;
+  height: 200px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid var(--medium-gray);
+  background: #f9f9f9;
+  border-radius: 4px;
+  resize: none;
+  box-sizing: border-box;
+  transition: border-color .3s ease
+}
+
+textarea:focus,
+.output:focus {
+  border-color: var(--blue)
+}
+
+button {
+  display: inline-block;
+  background: var(--blue);
+  color: var(--white-color);
+  border: none;
+  border-radius: 4px;
+  width: fit-content;
+  height: fit-content;
+  padding: 10px;
+  font-size: 14px;
+  margin:10px;
+  cursor: pointer;
+  transition: background-color .3s ease, transform .2s ease
+}
+
+button:hover {
+  background: var(--green);
+  transform: translateY(-2px)
+}
+
+@media(max-width:768px) {
+  .container {
+    grid-template-columns: 1fr
+  }
+
+  textarea,
+  .output {
+    height: 180px
+  }
+
+  h1,
+  p {
+    text-align: center
+  }
+
+  .styles_button {
+    width: 100%;
+    margin-bottom: 10px
+  }
+}
+
+header,
+footer {
+  background: var(--blue);
+}
+
+header img,
+footer img {
+  max-height: 100px
+}
+
+header {
+  font-size: 100px;
+  text-align: center;
+  font-family: "Cairo Play";
+  color: white;
+}
+
+footer {
+  margin-top: 1em;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+footer h2{
+  color: white;
+}
+
+#descriptiondiv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 20px;
+  grid-auto-flow: row
+}
+
+#descriptiondiv p {
+  margin: 20px
+}
+
+#descriptiondiv em {
+  font-size: 2.5em;
+  text-align: center;
+  display: block;
+  color: var(--blue);
+  font-family: "Cairo Play", sans-serif;
+}
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+  transition: color .3s ease
+}
+
+a:hover {
+  color: var(--secondary-color)
+}
+
+footer a {
+  color: white;
+  text-decoration: underline 1px solid white;
+  transition: color .3s ease, transform .2s ease
+}
+
+footer a:hover {
+  color: var(--green);
+  transform: translateY(-2px)
+}

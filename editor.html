@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarK2WebGen</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="logo.svg" />
+</head>
+
+<body>
+  <header><img src="logo.svg" />Mark2WebGen</header>
+  <section>
+    <h2>Editeur:</h2>
+    <div class="container">
+      <textarea id="MarkdownInput" placeholder="Écrivez votre Markdown ici..."></textarea>
+      <textarea id="CssInput" placeholder="Écrivez votre CSS ici..."></textarea>
+      <div class="output" id="HtmlOutput"></div>
+      <textarea id="HtmlCodeOutput" placeholder="Code HTML généré ici..." readonly></textarea>
+    </div>
+    <h2>Fichier:</h2>
+    <p></p>
+    <button id="archbtn">Télécharger au format d'Archives</button>
+    <button id="cssbtn">Télécharger le css</button>
+    <button id="htmlbtn">Télécharger l'html</button>
+    <br>
+    <h2>Styles:</h2>
+    <p></p>
+
+    <div class="container">
+      <div>
+        <p>Styles des "blockquote":</p>
+        <button class="styles_button"
+          onclick="blockquoteStylesToApply = blockquoteStylesList[0] || '';updateOutput();">Style avec bordure</button>
+        <button class="styles_button"
+          onclick="blockquoteStylesToApply = blockquoteStylesList[1] || '';updateOutput();">Style avec
+          guillemets</button>
+      </div>
+      <div>
+        <p>puce de listes:</p>
+        <input id="lipuce" type="text" placeholder="puce ex: &RightArrow; " />
+      </div>
+    </div>
+  </section>
+  <section id="description">
+    <h2>Comment utiliser Mark2WebGen</h2>
+    <p>Mark2WebGen est un outil simple pour générer du code HTML à partir de Markdown et de CSS. Voici comment
+      l'utiliser :</p>
+    <div id="descriptiondiv">
+      <p>
+        <em>1</em><br />
+        <strong>Écrire en Markdown :</strong> Dans la zone de texte "Écrivez votre Markdown ici...", saisissez votre
+        texte en utilisant la syntaxe Markdown. Par exemple, utilisez des astérisques pour le texte en gras ou des
+        dièses pour
+        les titres.
+      </p>
+      <p>
+        <em>2</em><br />
+        <strong>Ajouter du CSS :</strong> Dans la zone de texte "Écrivez votre CSS ici...", vous pouvez ajouter vos
+        styles CSS personnalisés pour styliser le HTML généré.
+      </p>
+      <p>
+        <em>3</em><br />
+        <strong>Voir le résultat :</strong> Le code HTML généré apparaîtra automatiquement dans la zone "Code HTML
+        généré ici...". Vous pouvez également voir le rendu visuel dans la section de sortie.
+      </p>
+      <p>
+        <em>4</em><br />
+        <strong>Appliquer des styles :</strong> Utilisez les boutons sous "Styles" pour appliquer des styles prédéfinis
+        aux éléments de type "blockquote". Vous pouvez également personnaliser les puces de vos listes en saisissant un
+        symbole dans le champ prévu à cet effet.
+      </p>
+    </div>
+    <p>Amusez-vous à créer et à styliser votre contenu web avec Mark2WebGen !</p>
+  </section>
+  <footer>
+    <h2>Droits d'Auteur</h2>
+    <p>&copy; 2023 Mark2WebGen. Tous droits réservés.</p>
+    <p>Ce projet est sous <a href="MIT.html">licence MIT</a>. Vous pouvez l'utiliser, le modifier et le distribuer
+      selon les termes de cette licence.</p>
+
+    <h2>Contact</h2>
+    <p>Pour voir tout mes autes projets vous pouvez aller a cette adresse : <a
+        href="https://github.com/Nitnaf10">https://github.com/Nitnaf10</a></p>
+    <p>Pour toute question veuillez me contacter sur mon serveur discord avec ce lien <a
+        href="https://discord.gg/fD93VcDE5E">Nitnaf's
+        Tools</a>.</p>
+
+  </footer>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</body>
+
+</html>
