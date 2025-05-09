@@ -54,8 +54,7 @@ ul li::before {content: '${customBullet.replace(/'/g, "\\'")}';color: inherit;di
     applyPreviewStyles(fullCss);
 }
 function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
+    return str.replace(/</g, '&lt;')
               .replace(/>/g, '&gt;')
               .replace(/"/g, '&quot;')
               .replace(/'/g, '&#39;');
