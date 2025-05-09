@@ -15,19 +15,14 @@
 
   <section>
     <h2>Éditeur :</h2>
+    <input type="file" id="imginput" accept="image/*" style="display: none;" />
+    <label for="imginput" id="imglabel">
+      <img src="plus.svg" alt="Importer un logo" id="logopreview" style="cursor: pointer; width: 32px; height: 32px;" />
+    </label>
+    <input type="text" id="pagename" placeholder="Entrez le nom de la page" /><br/>
     <div class="container" id="InOutGrid">
       <textarea id="MarkdownInput" placeholder="Écrivez votre Markdown ici..."></textarea>
-
-      <div id="prewiew">
-        <input type="file" id="imginput" accept="image/*" style="display: none;" />
-        <label for="imginput" id="imglabel">
-          <img src="plus.svg" alt="Importer un logo" id="logopreview" style="cursor: pointer; width: 32px; height: 32px;" />
-        </label>
-
-        <input type="text" id="pagename" placeholder="Entrez le nom de la page" /><br/>
-        <div class="output" id="HtmlOutput"></div>
-      </div>
-
+      <div class="output" id="HtmlOutput"></div>
       <textarea id="CssInput" placeholder="Écrivez votre CSS ici..."></textarea>
       <textarea id="HtmlCodeOutput" placeholder="Code HTML généré ici..." readonly></textarea>
     </div>
