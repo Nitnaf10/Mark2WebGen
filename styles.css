@@ -45,7 +45,7 @@ p {
 #InOutGrid{
 display: flex;
   flex-wrap: wrap;
-  *{width: 50%;}
+  *{max-width: 45%;}
 }
 .container {
   display: grid;
