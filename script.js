@@ -5,7 +5,7 @@ document.head.appendChild(script);
 
 // -- GLOBAL STYLES & STATE --
 let blockquoteStylesList = [
-  `blockquote{position:relative;border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
+  `blockquote{border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
   `blockquote{position:relative;margin:1em 0;font-style:italic;display:inline;padding-right:.9em;}
   blockquote::before{position:absolute;left:-0.5em;top:-0.5em;content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;}
   blockquote::after{position:absolute;transform:rotate(180deg);content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;right:0;}`
