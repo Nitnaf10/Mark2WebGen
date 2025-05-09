@@ -42,12 +42,19 @@ p {
   margin: 5px 0 15px;
   font-size: 16px
 }
-
+#InOutGrid{
+display: flex;
+  flex-wrap: wrap;
+  *{
+    min-width: 30%;
+    max-width: 50%;
+  }
+}
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
-  grid-template-areas: "MarkdownInput HtmlOutput" "CssInput HtmlCodeOutput";
+  grid-template-areas: ". ." ". .";
   gap: 20px;
 }
 section{
@@ -59,15 +66,9 @@ section{
   padding: 20px
 }
 
-#MarkdownInput,
-#CssInput {
-  grid-area: initial
-}
-
 #HtmlOutput {
   all: unset;
   font-family: Arial;
-  grid-area: HtmlOutput;
   background: var(--white-color);
   border: 1px solid var(--light-gray);
   padding: 15px;
@@ -80,7 +81,6 @@ section{
 }
 
 #HtmlCodeOutput {
-  grid-area: HtmlCodeOutput;
   background: var(--gray-light);
   font-family: monospace
 }
