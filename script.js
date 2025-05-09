@@ -68,6 +68,13 @@ ul li::before {content: '${customBullet.replace(/'/g, "\\'")}';color: inherit;di
 
     applyPreviewStyles(fullCss);
 }
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;');
+}
 
 function formatCSS(css) {
     return css
@@ -93,7 +100,7 @@ function formatHTML(html) {
 }
 
 function convertMarkdownToHTML(markdown) {
-    return `<p>${markdown
+    return `<p>${escapeHtml(markdown)
         .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
         .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
         .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
@@ -104,8 +111,8 @@ function convertMarkdownToHTML(markdown) {
         .replace(/__(.*?)__/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/_(.*?)_/g, '<em>$1</em>')
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtml(code)}</code></pre>`)
+        .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtml(code)}</code>`)
         .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
         .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
         .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
