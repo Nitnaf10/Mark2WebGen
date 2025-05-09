@@ -29,7 +29,7 @@ function convertMarkdown(md) {
     .replace(/__(.*?)__/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/_(.*?)_/g, '<em>$1</em>')
-    .replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${escapeHtml(c)}</code></pre>`)
+    .replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${escapeHtml(c)}</code></pre>`)  // Conversion des blocs de code
     .replace(/`([^`]+)`/g, (_, c) => `<code>${escapeHtml(c)}</code>`)
     .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
     .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
