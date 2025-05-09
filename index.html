@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,96 +7,87 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="logo.svg" />
 </head>
-
 <body>
-  <header><img src="logo.svg" />Mark2WebGen</header>
+  <header>
+    <img src="logo.svg" alt="logo" />
+    Mark2WebGen
+  </header>
+
   <section>
-    <h2>Editeur:</h2>
-    <div class="container" Id="InOutGrid" >
+    <h2>Éditeur :</h2>
+    <div class="container" id="InOutGrid">
       <textarea id="MarkdownInput" placeholder="Écrivez votre Markdown ici..."></textarea>
+
       <div id="prewiew">
         <input type="file" id="imginput" accept="image/*" style="display: none;" />
         <label for="imginput" id="imglabel">
           <img src="plus.svg" alt="Importer un logo" id="logopreview" style="cursor: pointer; width: 32px; height: 32px;" />
         </label>
 
-        <input type="text" id="pagename" placeholder="Entrez le nom de la page"></input><br/>
+        <input type="text" id="pagename" placeholder="Entrez le nom de la page" /><br/>
         <div class="output" id="HtmlOutput"></div>
       </div>
+
       <textarea id="CssInput" placeholder="Écrivez votre CSS ici..."></textarea>
       <textarea id="HtmlCodeOutput" placeholder="Code HTML généré ici..." readonly></textarea>
     </div>
-    <h2>Fichier:</h2>
-    <p></p>
-    <button id="archbtn">Télécharger au format d'Archives</button>
-    <button id="cssbtn">Télécharger le css</button>
-    <button id="htmlbtn">Télécharger l'html</button>
-    <br>
-    <h2>Styles:</h2>
-    <p></p>
 
+    <h2>Fichiers :</h2>
+    <button id="archbtn" title="Télécharger tout le projet en .zip">Télécharger au format d'Archives</button>
+    <button id="cssbtn" title="Télécharger uniquement le CSS">Télécharger le css</button>
+    <button id="htmlbtn" title="Télécharger uniquement le HTML">Télécharger l'html</button>
+
+    <h2>Styles :</h2>
     <div class="container">
       <div>
-        <p>Styles des "blockquote":</p>
+        <p>Styles des <code>blockquote</code> :</p>
         <button class="styles_button"
-          onclick="blockquoteStylesToApply = blockquoteStylesList[0] || '';updateOutput();">Style avec bordure</button>
+          onclick="blockquoteStylesToApply = blockquoteStylesList[0]; updateOutput();">Style avec bordure</button>
         <button class="styles_button"
-          onclick="blockquoteStylesToApply = blockquoteStylesList[1] || '';updateOutput();">Style avec
-          guillemets</button>
+          onclick="blockquoteStylesToApply = blockquoteStylesList[1]; updateOutput();">Style avec guillemets</button>
       </div>
       <div>
-        <p>puce de listes:</p>
-        <input id="lipuce" type="text" placeholder="puce ex: &RightArrow; " />
+        <p>Puce des listes :</p>
+        <input id="lipuce" type="text" placeholder="Puce ex: →" />
       </div>
     </div>
   </section>
+
   <section id="description">
     <h2>Comment utiliser Mark2WebGen</h2>
-    <p>Mark2WebGen est un outil simple pour générer du code HTML à partir de Markdown et de CSS. Voici comment
-      l'utiliser :</p>
+    <p>Mark2WebGen est un outil simple pour générer du code HTML à partir de Markdown et de CSS. Voici comment l'utiliser :</p>
     <div id="descriptiondiv">
-      <p>
-        <em>1</em><br />
-        <strong>Écrire en Markdown :</strong> Dans la zone de texte "Écrivez votre Markdown ici...", saisissez votre
-        texte en utilisant la syntaxe Markdown. Par exemple, utilisez des astérisques pour le texte en gras ou des
-        dièses pour
-        les titres.
+      <p><em>1</em><br />
+        <strong>Écrire en Markdown :</strong> Dans la zone de texte "Écrivez votre Markdown ici...", saisissez votre texte avec la syntaxe Markdown. Utilisez `#` pour les titres, `**gras**`, etc.
       </p>
-      <p>
-        <em>2</em><br />
-        <strong>Ajouter du CSS :</strong> Dans la zone de texte "Écrivez votre CSS ici...", vous pouvez ajouter vos
-        styles CSS personnalisés pour styliser le HTML généré.
+      <p><em>2</em><br />
+        <strong>Ajouter du CSS :</strong> Personnalisez l'apparence du HTML en ajoutant vos propres styles dans la zone CSS.
       </p>
-      <p>
-        <em>3</em><br />
-        <strong>Voir le résultat :</strong> Le code HTML généré apparaîtra automatiquement dans la zone "Code HTML
-        généré ici...". Vous pouvez également voir le rendu visuel dans la section de sortie.
+      <p><em>3</em><br />
+        <strong>Voir le résultat :</strong> Le rendu HTML est affiché à gauche. Le code source HTML apparaît à droite.
       </p>
-      <p>
-        <em>4</em><br />
-        <strong>Appliquer des styles :</strong> Utilisez les boutons sous "Styles" pour appliquer des styles prédéfinis
-        aux éléments de type "blockquote". Vous pouvez également personnaliser les puces de vos listes en saisissant un
-        symbole dans le champ prévu à cet effet.
+      <p><em>4</em><br />
+        <strong>Appliquer des styles :</strong> Choisissez un style de citation (blockquote) ou une puce personnalisée pour vos listes.
+      </p>
+      <p><em>5</em><br />
+        <strong>Exporter :</strong> Vous pouvez télécharger le CSS, le HTML ou l’ensemble sous forme d’archive .zip.
       </p>
     </div>
     <p>Amusez-vous à créer et à styliser votre contenu web avec Mark2WebGen !</p>
   </section>
+
   <footer>
     <h2>Droits d'Auteur</h2>
     <p>&copy; 2025 Nitnaf10. Tous droits réservés.</p>
-    <p>Ce projet est sous <a href="MIT.html">licence MIT</a>. Vous pouvez l'utiliser, le modifier et le distribuer
-      selon les termes de cette licence.</p>
+    <p>Ce projet est sous <a href="MIT.html">licence MIT</a>.</p>
 
     <h2>Contact</h2>
-    <p>Pour voir tout mes autes projets vous pouvez aller a cette adresse : <a
-        href="https://github.com/Nitnaf10">https://github.com/Nitnaf10</a></p>
-    <p>Pour toute question veuillez me contacter sur mon serveur discord avec ce lien <a
-        href="https://discord.gg/fD93VcDE5E">Nitnaf's
-        Tools</a>.</p>
-
+    <p>Voir mes autres projets : <a href="https://github.com/Nitnaf10">GitHub/Nitnaf10</a></p>
+    <p>Me contacter : <a href="https://discord.gg/fD93VcDE5E">Discord – Nitnaf's Tools</a></p>
   </footer>
-  <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-</body>
 
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
