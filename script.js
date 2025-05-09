@@ -17,18 +17,18 @@ const blockquoteStylesList = [
 ];
 
 const codeBlockStyle = `
-code {
+code, pre{
   background-color: #f4f4f4;
-  padding: 2px 4px;
   font-family: monospace;
+}
+code {
+  padding: 2px 4px;
   border-radius: 3px;
   font-size: 0.95em;
 }
 pre {
-  background-color: #f4f4f4;
   padding: 1em;
   overflow-x: auto;
-  font-family: monospace;
   border-radius: 5px;
 }
 pre code {
