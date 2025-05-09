@@ -14,17 +14,31 @@ const formatHTML = html => html.replace(/></g, '>\n<').replace(/<\/(ul|ol|p)>/g,
 const formatCSS = css => css.replace(/\/\*.*?\*\//gs, '').replace(/\s*{\s*/g, ' {\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*}\s*/g, '\n}\n\n').replace(/\n\s*\n/g, '\n').replace(/:\s*/g, ': ').trim();
 const applyPreviewStyles = css => { let style = $('previewStyles'); if (!style) { style = document.createElement('style'); style.id = 'previewStyles'; document.head.appendChild(style); } style.innerHTML = `.output { ${css} }`; };
 
-function escapeHtmlInsideCode(str) {
-  return str.replace(/[<>"']/g, m => ({
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[m]));
+function escapeHtml(str, isCode = false) {
+  // Si c'est du code, on n'échappe que les caractères spéciaux dans le code
+  if (isCode) {
+    return str.replace(/[<>"']/g, m => ({
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[m]));
+  }
+
+  // Si ce n'est pas du code, on échappe tout sauf les ">" au début de ligne pour les citations
+  return str.replace(/([^\n]*)(<|>|"|')/g, (match, text, char) => {
+    if (text.trim().startsWith('>') && char === '>') return match; // Ne pas échapper ">" en début de ligne
+    return text + ({
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char] || char);
+  });
 }
 
 function convertMarkdown(md) {
-  return `<p>${escapeHtml(md)
+  return `<p>${md
     .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
     .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
     .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
@@ -35,9 +49,17 @@ function convertMarkdown(md) {
     .replace(/__(.*?)__/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/_(.*?)_/g, '<em>$1</em>')
-    .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtmlInsideCode(code)}</code></pre>`)  // Applique l'échappement uniquement dans <code>
-    .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtmlInsideCode(code)}</code>`)  // Idem pour les balises <code> en ligne
+    
+    // Traitement des blocs de code
+    .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtml(code, true)}</code></pre>`)
+    .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtml(code, true)}</code>`)
+    
+    // Citations Markdown (ne pas échapper le ">" au début)
     .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
+
+    // Échappement des autres caractères
+    .replace(/[^\n]*([<>"'])/g, (match, char) => escapeHtml(match, false))
+    
     .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
     .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
@@ -47,6 +69,7 @@ function convertMarkdown(md) {
     .replace(/<p>\s*<\/p>/g, '')
   }</p>`;
 }
+
 
 
 // Mise à jour du contenu et application des styles
