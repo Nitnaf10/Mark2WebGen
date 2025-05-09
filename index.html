@@ -15,8 +15,11 @@
     <h2>Editeur:</h2>
     <div class="container" Id="InOutGrid" >
       <textarea id="MarkdownInput" placeholder="Écrivez votre Markdown ici..."></textarea>
-      <div id="wiew">
-        <button type="file" id="imginput" alt="Importer le logo de l'onglet" accept="jpg, png, svg, jpeg, webp">+</button>
+      <div id="prewiew">
+        <input type="file" id="imginput" accept="image/*" style="display: none;" />
+        <label for="imginput" id="imglabel">
+          <img src="logo.svg" alt="Importer le logo de l'onglet" id="logopreview" style="cursor: pointer; width: 32px; height: 32px;" />
+        </label>
         <input type="text" id="pagename" placeholder="Entrez le nom de la page"></input><br/>
         <div class="output" id="HtmlOutput"></div>
       </div>
