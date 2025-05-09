@@ -81,6 +81,7 @@ function convertMarkdownToHTML(markdown) {
         .replace(/^# (.*)$/gm, '<h1>$1</h1>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/__(.*?)__/g, '<strong>$1</strong>')
+        .replace(/\`\`\`(.*?)\`\`\`/g, '<textarea readonly>$1</textarea>')
         .replace(/\`(.*?)\`/g, '<textarea readonly>$1</textarea>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/_(.*?)_/g, '<em>$1</em>')
