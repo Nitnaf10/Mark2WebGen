@@ -10,13 +10,19 @@ const lipuceCSS = bullet => bullet ? `
 ul{list-style:none}
 ul li::before{content:'${bullet.replace(/'/g, "\\'")}';margin-right:0.5em}` : '';
 
-// Fonctions utilitaires
-const escapeHtml = s => s.replace(/[<>"']/g, m => ({ '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 const formatHTML = html => html.replace(/></g, '>\n<').replace(/<\/(ul|ol|p)>/g, '</$1>\n').trim();
 const formatCSS = css => css.replace(/\/\*.*?\*\//gs, '').replace(/\s*{\s*/g, ' {\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*}\s*/g, '\n}\n\n').replace(/\n\s*\n/g, '\n').replace(/:\s*/g, ': ').trim();
 const applyPreviewStyles = css => { let style = $('previewStyles'); if (!style) { style = document.createElement('style'); style.id = 'previewStyles'; document.head.appendChild(style); } style.innerHTML = `.output { ${css} }`; };
 
-// Conversion Markdown
+function escapeHtmlInsideCode(str) {
+  return str.replace(/[<>"']/g, m => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
+
 function convertMarkdown(md) {
   return `<p>${escapeHtml(md)
     .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
@@ -29,8 +35,8 @@ function convertMarkdown(md) {
     .replace(/__(.*?)__/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/_(.*?)_/g, '<em>$1</em>')
-    .replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${escapeHtml(c)}</code></pre>`)  // Conversion des blocs de code
-    .replace(/`([^`]+)`/g, (_, c) => `<code>${escapeHtml(c)}</code>`)
+    .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtmlInsideCode(code)}</code></pre>`)  // Applique l'échappement uniquement dans <code>
+    .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtmlInsideCode(code)}</code>`)  // Idem pour les balises <code> en ligne
     .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
     .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
     .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
@@ -41,6 +47,7 @@ function convertMarkdown(md) {
     .replace(/<p>\s*<\/p>/g, '')
   }</p>`;
 }
+
 
 // Mise à jour du contenu et application des styles
 function updateOutput() {
