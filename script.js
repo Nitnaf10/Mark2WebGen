@@ -6,12 +6,14 @@ const markdownInput = document.getElementById('MarkdownInput'),
     archbtn = document.getElementById('archbtn'),
     cssbtn = document.getElementById('cssbtn'),
     htmlbtn = document.getElementById('htmlbtn'),
-    cssPreview = document.getElementById('cssPreview');
+    pageNameInput = document.getElementById('pagename'),
+    imgInput = document.getElementById('imginput'),
+    logoPreview = document.getElementById('logopreview');
 
 const blockquoteStylesList = [
     `blockquote{position:relative;border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
     `blockquote{position:relative;margin:1em 0;font-style:italic;display:inline;
-  padding-right: .9em;}
+    padding-right: .9em;}
     blockquote::before{position:absolute;left:-0.5em;top:-0.5em;content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;}
     blockquote::after{position:absolute;transform:rotate(180deg);content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;right: 0;}`
 ];
@@ -24,6 +26,8 @@ pre code {background: none;padding: 0;font-size: inherit;}
 `;
 
 let blockquoteStylesToApply = blockquoteStylesList[0];
+let uploadedLogo = null;
+let logoExtension = null;
 
 function updateOutput() {
     const markdownText = markdownInput.value;
@@ -44,15 +48,15 @@ function updateOutput() {
     }
 
     if (customBullet) {
-        let buletcss = `
+        fullCss += `
 ul {list-style: none;}
 ul li::before {content: '${customBullet.replace(/'/g, "\\'")}';color: inherit;display: inline-block;width: auto;margin-right: .5em;}
 `;
-        fullCss += buletcss;
     }
 
     applyPreviewStyles(fullCss);
 }
+
 function escapeHtml(str) {
     return str.replace(/</g, '&lt;')
               .replace(/>/g, '&gt;')
@@ -134,8 +138,9 @@ function handleHtmlBtnClick() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document généré</title>
+    <title>${document.title}</title>
     <link rel="stylesheet" href="styles.css">
+    ${uploadedLogo ? `<link rel="icon" href="logo.${logoExtension}">` : ''}
 </head>
 <body>
     ${formattedHtml}
@@ -157,7 +162,7 @@ function handleCssBtnClick() {
     }
 
     if (customBullet) {
-        let buletcss = `
+        fullCss += `
 ul {
   list-style: none;
   padding-left: 1.5em;
@@ -170,7 +175,6 @@ ul li::before {
   margin-left: -1.5em;
 }
 `;
-        fullCss += buletcss;
     }
 
     downloadFile(fullCss, 'styles.css', 'text/css');
@@ -179,26 +183,28 @@ ul li::before {
 function handleArchBtnClick() {
     const zip = new JSZip();
     const formattedHtml = formatHTML(htmlOutput.innerHTML);
-    const completeHtml = `
+    const pageTitle = document.title || "Document généré";
+
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document généré</title>
+    <title>${pageTitle}</title>
     <link rel="stylesheet" href="styles.css">
+    ${uploadedLogo ? `<link rel="icon" href="logo.${logoExtension}">` : ''}
 </head>
 <body>
     ${formattedHtml}
 </body>
 </html>
     `;
-    zip.file("document.html", completeHtml);
+    zip.file("document.html", htmlContent);
 
     const rawCss = cssInput.value;
     const formattedCss = formatCSS(rawCss);
     const customBullet = lipuceInput.value.trim();
-
     let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
 
     if (htmlOutput.innerHTML.includes('<code>')) {
@@ -206,7 +212,7 @@ function handleArchBtnClick() {
     }
 
     if (customBullet) {
-        let buletcss = `
+        fullCss += `
 ul {
   list-style: none;
   padding-left: 1.5em;
@@ -219,18 +225,63 @@ ul li::before {
   margin-left: -1.5em;
 }
 `;
-        fullCss += buletcss;
     }
 
     zip.file("styles.css", fullCss);
 
-    zip.generateAsync({ type: "blob" }).then(function(content) {
+    if (uploadedLogo) {
+        zip.file(`logo.${logoExtension}`, uploadedLogo.blob);
+    }
+
+    zip.generateAsync({ type: "blob" }).then(content => {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(content);
         link.download = "archive.zip";
         link.click();
     });
 }
+
+// Mise à jour du <title> quand le nom de page change
+pageNameInput.addEventListener('input', function () {
+    if (this.value.trim()) {
+        document.title = this.value.trim();
+    }
+});
+
+// Gestion de l'import d'image/logo
+imgInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    logoExtension = file.name.split('.').pop().toLowerCase();
+    const validFormats = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
+    if (!validFormats.includes(logoExtension)) {
+        alert("Format de logo non pris en charge.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const logoDataUrl = e.target.result;
+        logoPreview.src = logoDataUrl;
+
+        // Mise à jour dynamique de favicon
+        let favicon = document.querySelector("link[rel~='icon']");
+        if (!favicon) {
+            favicon = document.createElement("link");
+            favicon.rel = "icon";
+            document.head.appendChild(favicon);
+        }
+        favicon.href = logoDataUrl;
+
+        uploadedLogo = {
+            blob: file,
+            dataUrl: logoDataUrl,
+            name: `logo.${logoExtension}`
+        };
+    };
+    reader.readAsDataURL(file);
+});
 
 archbtn.addEventListener('click', handleArchBtnClick);
 cssbtn.addEventListener('click', handleCssBtnClick);
@@ -239,4 +290,5 @@ htmlbtn.addEventListener('click', handleHtmlBtnClick);
 lipuceInput.addEventListener('input', updateOutput);
 markdownInput.addEventListener('input', updateOutput);
 cssInput.addEventListener('input', updateOutput);
+
 updateOutput();
