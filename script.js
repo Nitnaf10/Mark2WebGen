@@ -5,8 +5,8 @@ document.head.appendChild(script);
 let blockquoteStylesList = [
   `blockquote{border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
   `blockquote { position: relative; margin: 1em 0;  font-style: italic;  display: inline-block;  padding: 1.5em 2em;  color: #333;}
-blockquote::before,blockquote::after {content: "";position: absolute;width: 24px;height: 24px;background-size: contain;background-repeat: no-repeat;opacity: 0.3;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 56'%3E%3Cpath fill='%23333' d='M29.866 0v24.286H14.79V26h.143c8.246 0 14.93 6.715 14.93 15 0 8.283-6.684 14.999-14.93 14.999C6.685 56 0 49.284 0 41q0-.215.006-.428H0V17.143C0 7.675 7.64 0 17.064 0zM64 0v24.286H48.923V26h.142c8.247 0 14.931 6.715 14.931 15 0 8.283-6.684 14.999-14.93 14.999-8.247 0-14.932-6.716-14.932-15q0-.215.006-.428h-.006V17.143C34.134 7.675 41.774 0 51.198 0z'/%3E%3C/svg%3E");
+  blockquote::before,blockquote::after {content: "";position: absolute;width: 24px;height: 24px;background-size: contain;background-repeat: no-repeat;opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 64 56'%3E%3Cpath fill='%23333' d='M29.866 0v24.286H14.79V26h.143c8.246 0 14.93 6.715 14.93 15 0 8.283-6.684 14.999-14.93 14.999C6.685 56 0 49.284 0 41q0-.215.006-.428H0V17.143C0 7.675 7.64 0 17.064 0zM64 0v24.286H48.923V26h.142c8.247 0 14.931 6.715 14.931 15 0 8.283-6.684 14.999-14.93 14.999-8.247 0-14.932-6.716-14.932-15q0-.215.006-.428h-.006V17.143C34.134 7.675 41.774 0 51.198 0z'/%3E%3C/svg%3E");
   }
 blockquote::before {top: -0.5em;left: -1em;}
 blockquote::after {bottom: -0.5em;right: -1em;transform: scaleX(-1);}`
