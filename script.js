@@ -73,7 +73,8 @@ function formatHTML(html) {
 
 // Conversion du Markdown en HTML
 function convertMarkdownToHTML(markdown) {
-    markdown = markdown.replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+    return `<p>${markdown
+        .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
         .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
         .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
         .replace(/^### (.*)$/gm, '<h3>$1</h3>')
@@ -81,21 +82,21 @@ function convertMarkdownToHTML(markdown) {
         .replace(/^# (.*)$/gm, '<h1>$1</h1>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/__(.*?)__/g, '<strong>$1</strong>')
-        .replace(/\`\`\`(.*?)\`\`\`/g, '<textarea readonly>$1</textarea>')
-        .replace(/\`(.*?)\`/g, '<input type="text" readonly>$1</input>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/_(.*?)_/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
         .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
-        .replace(/^[-*_]{3,}$/gm, '<hr>')
-        .replace(/^\s*[-*+] (.*)$/gm, '<ul><li>$1</li></ul>')
-        .replace(/<\/ul>\n<ul>/g, '\n')
-        .replace(/^\s*\d+\. (.*)$/gm, '<ol><li>$1</li></ol>')
-        .replace(/<\/ol>\n<ol>/g, '\n')
-        .replace(/\n{2,}/g, '</p><p>');
-
-    markdown = `<p>${markdown}</p>`.replace(/<p>\s*<\/p>/g, '');
-    return markdown;
+        .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
+        .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+        .replace(/^\s*\d+\. (.*)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>')
+        .replace(/\n{2,}/g, '</p><p>')
+        .replace(/<p>\s*<\/p>/g, '')
+    }</p>`;
 }
+
 
 // Appliquer les styles dans le div d'aperçu
 // Appliquer les styles dans le div d'aperçu
