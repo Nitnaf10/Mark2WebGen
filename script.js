@@ -58,6 +58,8 @@ const title = document.getElementById("pagename").value || "Index";
 const markdown = document.getElementById("MarkdownInput").value;
 const htmlOutput = marked.parse(markdown);
 
+document.getElementById("HtmlOutput").innerHTML = htmlOutput;
+
 const formattedHtmlCode = `<!DOCTYPE html>
 <html lang="fr">
 <head>
