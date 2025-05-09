@@ -13,74 +13,50 @@ let blockquoteStylesToApply = blockquoteStylesList[0];
 let faviconDataUrl = null;
 
 function escapeHTML(str) {
-  return str.replace(/[&<>"']/g, function(m) {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    }[m];
-  });
+  return str.replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  }[m]));
 }
 
 function customMarkdownParse(markdown) {
   markdown = markdown
     .split('\n')
-    .map(line => {
-      if (line.startsWith('>')) return `> ${line.slice(1)}`;
-      return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    })
+    .map(line => line.startsWith('>') ? `> ${line.slice(1)}` : line.replace(/</g, '&lt;').replace(/>/g, '&gt;'))
     .join('\n');
   return marked.parse(markdown);
 }
 
 function prefixCss(css) {
   return css.split('\n').map(l => {
-    let t = l.trim();
-    return t == '' || t.startsWith('@') || t.startsWith('/*') || t.startsWith('//') ? l : l.replace(/^([^{]+)/, s => `#HtmlOutput ${s.trim()}`)
+    const t = l.trim();
+    return t === '' || t.startsWith('@') || t.startsWith('/*') || t.startsWith('//')
+      ? l
+      : l.replace(/^([^{]+)/, s => `#HtmlOutput ${s.trim()}`);
   }).join('\n');
+}
+
+function getBaseCss() {
+  return `#HtmlOutput *{all:revert;}
+#HtmlOutput pre{background:#f5f5f5;padding:1em;overflow:auto;border-radius:5px;font-family:monospace;font-size:.95em;line-height:1.4;margin:1em 0;white-space:pre-wrap;}
+#HtmlOutput code{background:#f0f0f0;padding:.2em .4em;border-radius:3px;font-family:monospace;font-size:.95em;}
+#HtmlOutput pre code{background:none;padding:0;border-radius:0;}`;
 }
 
 function updateOutput() {
   const m = document.getElementById("MarkdownInput").value,
-    c = document.getElementById("CssInput").value,
-    h = marked.parse(m, {
-      breaks: true
-    }),
-    f = "#HtmlOutput *{all:revert;}\n" + prefixCss(c);
+        c = document.getElementById("CssInput").value,
+        h = marked.parse(m, { breaks: true }),
+        f = `${getBaseCss()}\n${prefixCss(c)}\n${blockquoteStylesToApply}`;
   document.getElementById("HtmlOutput").innerHTML = `<style>${f}</style>${h}`;
   document.getElementById("HtmlCodeOutput").value = formatHtml(h);
 }
 
-// Format & Generate HTML code
-const title = document.getElementById("pagename").value || "Index";
-const markdown = document.getElementById("MarkdownInput").value;
-const htmlOutput = marked.parse(markdown);
-
-document.getElementById("HtmlOutput").innerHTML = htmlOutput;
-
-const formattedHtmlCode = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title}</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-${htmlOutput}
-</body>
-</html>`.trim();
-
-document.getElementById("HtmlCodeOutput").value = formattedHtmlCode;
+function formatHtml(html) {
+  return html.trim(); // ou plus complexe si souhaité
+}
 
 function formatCSS(css) {
-  return css
-    .replace(/;/g, ';\n')
-    .replace(/\}/g, '}\n')
-    .replace(/\{/g, '{\n')
-    .trim();
+  return css.replace(/;/g, ';\n').replace(/\}/g, '}\n').replace(/\{/g, '{\n').trim();
 }
 
 function downloadFile(filename, content, mime = "text/plain") {
@@ -96,19 +72,18 @@ function downloadFile(filename, content, mime = "text/plain") {
 document.getElementById("archbtn").addEventListener("click", async () => {
   const zip = new JSZip();
   const title = document.getElementById("pagename").value || "Projet";
-  const css = formatCSS(document.getElementById("CssInput").value);
+  const css = `${getBaseCss()}\n${prefixCss(document.getElementById("CssInput").value)}\n${blockquoteStylesToApply}`;
   const html = document.getElementById("HtmlCodeOutput").value;
-
-  zip.file("styles.css", css);
-  zip.file(`${title || 'Index'}.html`, html);
+  zip.file("styles.css", formatCSS(css));
+  zip.file(`${title}.html`, html);
   if (faviconDataUrl) zip.file(`logo.${faviconDataUrl.type.split("/")[1]}`, faviconDataUrl.blob);
   const content = await zip.generateAsync({ type: "blob" });
-  downloadFile(`${title || "Projet"}.zip`, content, "application/zip");
+  downloadFile(`${title}.zip`, content, "application/zip");
 });
 
 document.getElementById("cssbtn").addEventListener("click", () => {
-  const css = formatCSS(document.getElementById("CssInput").value);
-  downloadFile("styles.css", css, "text/css");
+  const css = `${getBaseCss()}\n${prefixCss(document.getElementById("CssInput").value)}\n${blockquoteStylesToApply}`;
+  downloadFile("styles.css", formatCSS(css), "text/css");
 });
 
 document.getElementById("htmlbtn").addEventListener("click", () => {
