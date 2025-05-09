@@ -6,7 +6,7 @@ const markdownInput = document.getElementById('MarkdownInput'),
     archbtn = document.getElementById('archbtn'),
     cssbtn = document.getElementById('cssbtn'),
     htmlbtn = document.getElementById('htmlbtn'),
-    cssPreview = document.getElementById('cssPreview'); // Ajout du div pour l'aperçu
+    cssPreview = document.getElementById('cssPreview');
 
 const blockquoteStylesList = [
     `blockquote{position:relative;border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
@@ -15,6 +15,28 @@ const blockquoteStylesList = [
     blockquote::before{position:absolute;left:-0.5em;top:-0.5em;content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;}
     blockquote::after{position:absolute;transform:rotate(180deg);content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;right: 0;}`
 ];
+
+const codeBlockStyle = `
+code {
+  background-color: #f4f4f4;
+  padding: 2px 4px;
+  font-family: monospace;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+pre {
+  background-color: #f4f4f4;
+  padding: 1em;
+  overflow-x: auto;
+  font-family: monospace;
+  border-radius: 5px;
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+`;
 
 let blockquoteStylesToApply = blockquoteStylesList[0];
 
@@ -30,7 +52,12 @@ function updateOutput() {
     htmlOutput.innerHTML = rawHtml;
     htmlCodeOutput.value = formattedHtml;
 
-    let fullCss = `${formattedCss} ${formatCSS(blockquoteStylesToApply)}`;
+    let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+
+    if (rawHtml.includes('<code>')) {
+        fullCss += '\n' + codeBlockStyle;
+    }
+
     if (customBullet) {
         let buletcss = `
 ul {list-style: none;}
@@ -39,27 +66,21 @@ ul li::before {content: '${customBullet.replace(/'/g, "\\'")}';color: inherit;di
         fullCss += buletcss;
     }
 
-    // Injecter le CSS généré dans la section d'aperçu
     applyPreviewStyles(fullCss);
 }
 
-
-// Formatage du CSS
 function formatCSS(css) {
     return css
-        .replace(/\/\*.*?\*\//gs, '') // Supprime les commentaires
-        .replace(/\s*{\s*/g, ' {\n  ') // Ajoute un retour à la ligne après '{'
-        .replace(/;\s*/g, ';\n  ') // Ajoute un retour à la ligne après ';'
-        .replace(/\s*}\s*/g, '\n}\n\n') // Ajoute un retour à la ligne avant '}'
-        .replace(/\n\s*\n/g, '\n') // Supprime les lignes vides
-        .replace(/:\s*(?!['"][^'"]*['"])/g, ': ') // Formate les ":"
-        .replace(/:\s*:\s*/g, '::') // Corrige les espaces supplémentaires autour des "::"
-        .trim(); // Supprime les espaces au début et à la fin
+        .replace(/\/\*.*?\*\//gs, '')
+        .replace(/\s*{\s*/g, ' {\n  ')
+        .replace(/;\s*/g, ';\n  ')
+        .replace(/\s*}\s*/g, '\n}\n\n')
+        .replace(/\n\s*\n/g, '\n')
+        .replace(/:\s*(?!['"][^'"]*['"])/g, ': ')
+        .replace(/:\s*:\s*/g, '::')
+        .trim();
 }
 
-
-
-// Formatage de l'HTML
 function formatHTML(html) {
     return html
         .replace(/></g, '>\n<')
@@ -71,7 +92,6 @@ function formatHTML(html) {
         .trim();
 }
 
-// Conversion du Markdown en HTML
 function convertMarkdownToHTML(markdown) {
     return `<p>${markdown
         .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
@@ -97,25 +117,16 @@ function convertMarkdownToHTML(markdown) {
     }</p>`;
 }
 
-
-// Appliquer les styles dans le div d'aperçu
-// Appliquer les styles dans le div d'aperçu
 function applyPreviewStyles(css) {
-    // Créer une balise <style> pour appliquer les styles à l'aperçu
     let styleElement = document.getElementById('previewStyles');
-    
     if (!styleElement) {
         styleElement = document.createElement('style');
         styleElement.id = 'previewStyles';
         document.head.appendChild(styleElement);
     }
-    
-    // Envelopper le CSS généré dans .output {}
     styleElement.innerHTML = `.output { ${css} }`;
 }
 
-
-// Fonction pour télécharger un fichier
 function downloadFile(content, filename, mimeType) {
     const blob = new Blob([content], { type: mimeType });
     const link = document.createElement('a');
@@ -124,11 +135,8 @@ function downloadFile(content, filename, mimeType) {
     link.click();
 }
 
-// Générer le fichier HTML avec lien vers le CSS
 function handleHtmlBtnClick() {
     const formattedHtml = formatHTML(htmlOutput.innerHTML);
-
-    // Créer l'HTML complet avec DOCTYPE, head et lien vers le CSS
     const completeHtml = `
 <!DOCTYPE html>
 <html lang="fr">
@@ -143,18 +151,20 @@ function handleHtmlBtnClick() {
 </body>
 </html>
     `;
-
     downloadFile(completeHtml, 'document.html', 'text/html');
 }
 
-// Générer et télécharger le fichier CSS
 function handleCssBtnClick() {
-    const markdownText = markdownInput.value;
     const rawCss = cssInput.value;
     const formattedCss = formatCSS(rawCss);
     const customBullet = lipuceInput.value.trim();
 
     let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+
+    if (htmlOutput.innerHTML.includes('<code>')) {
+        fullCss += '\n' + codeBlockStyle;
+    }
+
     if (customBullet) {
         let buletcss = `
 ul {
@@ -172,15 +182,11 @@ ul li::before {
         fullCss += buletcss;
     }
 
-    // Télécharger le fichier CSS complet
     downloadFile(fullCss, 'styles.css', 'text/css');
 }
 
-// Fonction pour créer l'archive
 function handleArchBtnClick() {
     const zip = new JSZip();
-
-    // Ajouter le fichier HTML
     const formattedHtml = formatHTML(htmlOutput.innerHTML);
     const completeHtml = `
 <!DOCTYPE html>
@@ -198,13 +204,16 @@ function handleArchBtnClick() {
     `;
     zip.file("document.html", completeHtml);
 
-    // Ajouter le fichier CSS
-    const markdownText = markdownInput.value;
     const rawCss = cssInput.value;
     const formattedCss = formatCSS(rawCss);
     const customBullet = lipuceInput.value.trim();
 
     let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+
+    if (htmlOutput.innerHTML.includes('<code>')) {
+        fullCss += '\n' + codeBlockStyle;
+    }
+
     if (customBullet) {
         let buletcss = `
 ul {
@@ -221,19 +230,17 @@ ul li::before {
 `;
         fullCss += buletcss;
     }
+
     zip.file("styles.css", fullCss);
 
-    // Générer l'archive ZIP
-    zip.generateAsync({ type: "blob" })
-        .then(function(content) {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = "archive.zip";
-            link.click();
-        });
+    zip.generateAsync({ type: "blob" }).then(function(content) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = "archive.zip";
+        link.click();
+    });
 }
 
-// Événements pour les boutons
 archbtn.addEventListener('click', handleArchBtnClick);
 cssbtn.addEventListener('click', handleCssBtnClick);
 htmlbtn.addEventListener('click', handleHtmlBtnClick);
