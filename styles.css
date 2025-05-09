@@ -88,10 +88,20 @@ section{
   background: var(--gray-light);
   font-family: monospace
 }
-
-input {
-  margin: 3px;
+input[type="text"] {
+  width: min-content;
+  padding: 10px;
+  font-size: 10px;
+  border: 1px solid var(--medium-gray);
+  background: #f9f9f9;
   border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color .3s ease;
+  margin: 10px 0; /* Ajout d'une marge pour espacer les inputs */
+}
+
+input[type="text"]:focus {
+  border-color: var(--blue);
 }
 
 textarea,
