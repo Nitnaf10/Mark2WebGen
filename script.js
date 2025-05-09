@@ -69,7 +69,6 @@ ${htmlOutput}
 </html>`.trim();
 
   document.getElementById("HtmlCodeOutput").value = formattedHtmlCode;
-}
 
 function formatCSS(css) {
   return css
