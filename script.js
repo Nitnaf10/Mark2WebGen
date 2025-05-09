@@ -1,294 +1,282 @@
-const markdownInput = document.getElementById('MarkdownInput'),
-    cssInput = document.getElementById('CssInput'),
-    htmlOutput = document.getElementById('HtmlOutput'),
-    htmlCodeOutput = document.getElementById('HtmlCodeOutput'),
-    lipuceInput = document.getElementById('lipuce'),
-    archbtn = document.getElementById('archbtn'),
-    cssbtn = document.getElementById('cssbtn'),
-    htmlbtn = document.getElementById('htmlbtn'),
-    pageNameInput = document.getElementById('pagename'),
-    imgInput = document.getElementById('imginput'),
-    logoPreview = document.getElementById('logopreview');
+const markdownInput = document.getElementById('MarkdownInput');
+const cssInput = document.getElementById('CssInput');
+const htmlOutput = document.getElementById('HtmlOutput');
+const htmlCodeOutput = document.getElementById('HtmlCodeOutput');
+const lipuceInput = document.getElementById('lipuce');
+const archbtn = document.getElementById('archbtn');
+const cssbtn = document.getElementById('cssbtn');
+const htmlbtn = document.getElementById('htmlbtn');
+const imgInput = document.getElementById('imginput');
+const pageNameInput = document.getElementById('pagename');
 
-const blockquoteStylesList = [
-    `blockquote{position:relative;border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
-    `blockquote{position:relative;margin:1em 0;font-style:italic;display:inline;
-    padding-right: .9em;}
-    blockquote::before{position:absolute;left:-0.5em;top:-0.5em;content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;}
-    blockquote::after{position:absolute;transform:rotate(180deg);content:'"';font-family:Arial,sans-serif;font-size:2em;color:#ccc;right: 0;}`
-];
+let blockquoteStylesToApply = `
+blockquote {
+  position: relative;
+  border-left: 5px solid #ccc;
+  padding-left: 10px;
+  margin: 1em 0;
+}`;
 
 const codeBlockStyle = `
-code, pre{background-color: #f4f4f4;font-family: monospace;}
-code {padding: 2px 4px;border-radius: 3px;font-size: 0.95em;}
-pre {padding: 1em;overflow-x: auto;border-radius: 5px;}
-pre code {background: none;padding: 0;font-size: inherit;}
+code, pre {
+  background-color: #f4f4f4;
+  font-family: monospace;
+}
+code {
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+pre {
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 5px;
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
 `;
 
-let blockquoteStylesToApply = blockquoteStylesList[0];
 let uploadedLogo = null;
-let logoExtension = null;
+let uploadedLogoFormat = null;
 
 function updateOutput() {
-    const markdownText = markdownInput.value;
-    const rawCss = cssInput.value;
-    const formattedCss = formatCSS(rawCss);
-    const customBullet = lipuceInput.value.trim();
+  const markdownText = markdownInput.value;
+  const cssText = cssInput.value;
+  const bullet = lipuceInput.value.trim();
 
-    const rawHtml = convertMarkdownToHTML(markdownText);
-    const formattedHtml = formatHTML(rawHtml);
+  const rawHtml = convertMarkdownToHTML(markdownText);
+  const formattedHtml = formatHTML(rawHtml);
+  htmlOutput.innerHTML = rawHtml;
+  htmlCodeOutput.value = formattedHtml;
 
-    htmlOutput.innerHTML = rawHtml;
-    htmlCodeOutput.value = formattedHtml;
+  let fullCss = formatCSS(cssText) + '\n' + blockquoteStylesToApply;
 
-    let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+  if (rawHtml.includes('<code>')) {
+    fullCss += '\n' + codeBlockStyle;
+  }
 
-    if (rawHtml.includes('<code>')) {
-        fullCss += '\n' + codeBlockStyle;
-    }
-
-    if (customBullet) {
-        fullCss += `
-ul {list-style: none;}
-ul li::before {content: '${customBullet.replace(/'/g, "\\'")}';color: inherit;display: inline-block;width: auto;margin-right: .5em;}
-`;
-    }
-
-    applyPreviewStyles(fullCss);
+  if (bullet) {
+    fullCss += `
+ul {
+  list-style: none;
 }
-
-function escapeHtml(str) {
-    return str.replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&#39;');
+ul li::before {
+  content: '${bullet.replace(/'/g, "\\'")}';
+  display: inline-block;
+  margin-right: 0.5em;
 }
+    `;
+  }
 
-function formatCSS(css) {
-    return css
-        .replace(/\/\*.*?\*\//gs, '')
-        .replace(/\s*{\s*/g, ' {\n  ')
-        .replace(/;\s*/g, ';\n  ')
-        .replace(/\s*}\s*/g, '\n}\n\n')
-        .replace(/\n\s*\n/g, '\n')
-        .replace(/:\s*(?!['"][^'"]*['"])/g, ': ')
-        .replace(/:\s*:\s*/g, '::')
-        .trim();
-}
+  applyPreviewStyles(fullCss);
 
-function formatHTML(html) {
-    return html
-        .replace(/></g, '>\n<')
-        .replace(/<li>/g, '  <li>')
-        .replace(/<\/ul>/g, '</ul>\n')
-        .replace(/<\/ol>/g, '</ol>\n')
-        .replace(/<\/p>/g, '</p>\n')
-        .replace(/<hr>/g, '<hr>\n')
-        .trim();
+  // Change title
+  const titleText = pageNameInput.value.trim();
+  if (titleText) {
+    document.title = titleText;
+  }
 }
 
 function convertMarkdownToHTML(markdown) {
-    return `<p>${escapeHtml(markdown)
-        .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
-        .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
-        .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
-        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/__(.*?)__/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/_(.*?)_/g, '<em>$1</em>')
-        .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtml(code)}</code></pre>`)
-        .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtml(code)}</code>`)
-        .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
-        .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
-        .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
-        .replace(/^\s*\d+\. (.*)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>')
-        .replace(/\n{2,}/g, '</p><p>')
-        .replace(/<p>\s*<\/p>/g, '')
-    }</p>`;
+  return `<p>${escapeHtml(markdown)
+    .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+    .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
+    .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.*?)__/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${escapeHtml(code)}</code></pre>`)
+    .replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtml(code)}</code>`)
+    .replace(/^\s*> (.*)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^\s*[-*_]{3,}$/gm, '<hr>')
+    .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+    .replace(/^\s*\d+\. (.*)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>')
+    .replace(/\n{2,}/g, '</p><p>')
+    .replace(/<p>\s*<\/p>/g, '')
+  }</p>`;
+}
+
+function escapeHtml(str) {
+  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function formatHTML(html) {
+  return html.replace(/></g, '>\n<')
+    .replace(/<\/(ul|ol|p)>/g, '</$1>\n')
+    .trim();
+}
+
+function formatCSS(css) {
+  return css.replace(/\/\*.*?\*\//gs, '')
+    .replace(/\s*{\s*/g, ' {\n  ')
+    .replace(/;\s*/g, ';\n  ')
+    .replace(/\s*}\s*/g, '\n}\n\n')
+    .replace(/\n\s*\n/g, '\n')
+    .replace(/:\s*/g, ': ')
+    .trim();
 }
 
 function applyPreviewStyles(css) {
-    let styleElement = document.getElementById('previewStyles');
-    if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = 'previewStyles';
-        document.head.appendChild(styleElement);
-    }
-    styleElement.innerHTML = `.output { ${css} }`;
+  let styleElement = document.getElementById('previewStyles');
+  if (!styleElement) {
+    styleElement = document.createElement('style');
+    styleElement.id = 'previewStyles';
+    document.head.appendChild(styleElement);
+  }
+  styleElement.innerHTML = `.output { ${css} }`;
+}
+
+function handleFileInputChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const format = file.name.split('.').pop().toLowerCase();
+  uploadedLogoFormat = format;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const dataUrl = e.target.result;
+    uploadedLogo = dataUrl;
+
+    // Affiche le logo sélectionné à la place du bouton
+    const preview = document.createElement('img');
+    preview.src = dataUrl;
+    preview.alt = 'Logo sélectionné';
+    preview.style.maxHeight = '40px';
+    preview.style.cursor = 'pointer';
+
+    imgInput.replaceWith(preview);
+
+    // Met à jour la favicon
+    updateFavicon(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateFavicon(dataUrl) {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = dataUrl;
 }
 
 function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
+  const blob = new Blob([content], { type: mimeType });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
 }
 
-function handleHtmlBtnClick() {
-    const formattedHtml = formatHTML(htmlOutput.innerHTML);
-    const completeHtml = `
+function handleDownloadHTML() {
+  const formattedHtml = formatHTML(htmlOutput.innerHTML);
+  const pageTitle = pageNameInput.value.trim() || 'Document généré';
+  const htmlContent = `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${document.title}</title>
-    <link rel="stylesheet" href="styles.css">
-    ${uploadedLogo ? `<link rel="icon" href="logo.${logoExtension}">` : ''}
+  <meta charset="UTF-8">
+  <title>${escapeHtml(pageTitle)}</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="logo.${uploadedLogoFormat || 'png'}">
 </head>
 <body>
-    ${formattedHtml}
+${formattedHtml}
 </body>
-</html>
-    `;
-    downloadFile(completeHtml, 'document.html', 'text/html');
+</html>`;
+
+  downloadFile(htmlContent, 'document.html', 'text/html');
 }
 
-function handleCssBtnClick() {
-    const rawCss = cssInput.value;
-    const formattedCss = formatCSS(rawCss);
-    const customBullet = lipuceInput.value.trim();
+function handleDownloadCSS() {
+  let css = formatCSS(cssInput.value) + '\n' + blockquoteStylesToApply;
 
-    let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+  if (htmlOutput.innerHTML.includes('<code>')) {
+    css += '\n' + codeBlockStyle;
+  }
 
-    if (htmlOutput.innerHTML.includes('<code>')) {
-        fullCss += '\n' + codeBlockStyle;
-    }
-
-    if (customBullet) {
-        fullCss += `
-ul {
-  list-style: none;
-  padding-left: 1.5em;
-}
+  if (lipuceInput.value.trim()) {
+    css += `
+ul { list-style: none; }
 ul li::before {
-  content: '${customBullet.replace(/'/g, "\\'")}';
-  color: inherit;
-  display: inline-block;
-  width: auto;
-  margin-left: -1.5em;
-}
-`;
-    }
+  content: '${lipuceInput.value.trim().replace(/'/g, "\\'")}';
+  margin-right: 0.5em;
+}`;
+  }
 
-    downloadFile(fullCss, 'styles.css', 'text/css');
+  downloadFile(css, 'styles.css', 'text/css');
 }
 
-function handleArchBtnClick() {
-    const zip = new JSZip();
-    const formattedHtml = formatHTML(htmlOutput.innerHTML);
-    const pageTitle = document.title || "Document généré";
+function handleDownloadZip() {
+  const zip = new JSZip();
 
-    const htmlContent = `
+  const pageTitle = pageNameInput.value.trim() || 'Document généré';
+
+  const formattedHtml = formatHTML(htmlOutput.innerHTML);
+  const htmlContent = `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${pageTitle}</title>
-    <link rel="stylesheet" href="styles.css">
-    ${uploadedLogo ? `<link rel="icon" href="logo.${logoExtension}">` : ''}
+  <meta charset="UTF-8">
+  <title>${escapeHtml(pageTitle)}</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="logo.${uploadedLogoFormat || 'png'}">
 </head>
 <body>
-    ${formattedHtml}
+${formattedHtml}
 </body>
-</html>
-    `;
-    zip.file("document.html", htmlContent);
+</html>`;
+  zip.file('document.html', htmlContent);
 
-    const rawCss = cssInput.value;
-    const formattedCss = formatCSS(rawCss);
-    const customBullet = lipuceInput.value.trim();
-    let fullCss = `${formattedCss}\n${blockquoteStylesToApply}`;
+  let css = formatCSS(cssInput.value) + '\n' + blockquoteStylesToApply;
 
-    if (htmlOutput.innerHTML.includes('<code>')) {
-        fullCss += '\n' + codeBlockStyle;
-    }
+  if (formattedHtml.includes('<code>')) {
+    css += '\n' + codeBlockStyle;
+  }
 
-    if (customBullet) {
-        fullCss += `
-ul {
-  list-style: none;
-  padding-left: 1.5em;
-}
+  if (lipuceInput.value.trim()) {
+    css += `
+ul { list-style: none; }
 ul li::before {
-  content: '${customBullet.replace(/'/g, "\\'")}';
-  color: inherit;
-  display: inline-block;
-  width: auto;
-  margin-left: -1.5em;
-}
-`;
-    }
+  content: '${lipuceInput.value.trim().replace(/'/g, "\\'")}';
+  margin-right: 0.5em;
+}`;
+  }
 
-    zip.file("styles.css", fullCss);
+  zip.file('styles.css', css);
 
-    if (uploadedLogo) {
-        zip.file(`logo.${logoExtension}`, uploadedLogo.blob);
-    }
+  if (uploadedLogo) {
+    const logoData = uploadedLogo.split(',')[1];
+    zip.file(`logo.${uploadedLogoFormat}`, logoData, { base64: true });
+  }
 
-    zip.generateAsync({ type: "blob" }).then(content => {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = "archive.zip";
-        link.click();
-    });
+  zip.generateAsync({ type: 'blob' }).then(blob => {
+    downloadFile(blob, 'archive.zip', 'application/zip');
+  });
 }
 
-// Mise à jour du <title> quand le nom de page change
-pageNameInput.addEventListener('input', function () {
-    if (this.value.trim()) {
-        document.title = this.value.trim();
-    }
-});
-
-// Gestion de l'import d'image/logo
-imgInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-
-    logoExtension = file.name.split('.').pop().toLowerCase();
-    const validFormats = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
-    if (!validFormats.includes(logoExtension)) {
-        alert("Format de logo non pris en charge.");
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const logoDataUrl = e.target.result;
-        logoPreview.src = logoDataUrl;
-
-        // Mise à jour dynamique de favicon
-        let favicon = document.querySelector("link[rel~='icon']");
-        if (!favicon) {
-            favicon = document.createElement("link");
-            favicon.rel = "icon";
-            document.head.appendChild(favicon);
-        }
-        favicon.href = logoDataUrl;
-
-        uploadedLogo = {
-            blob: file,
-            dataUrl: logoDataUrl,
-            name: `logo.${logoExtension}`
-        };
-    };
-    reader.readAsDataURL(file);
-});
-
-archbtn.addEventListener('click', handleArchBtnClick);
-cssbtn.addEventListener('click', handleCssBtnClick);
-htmlbtn.addEventListener('click', handleHtmlBtnClick);
-
-lipuceInput.addEventListener('input', updateOutput);
+// Event listeners
 markdownInput.addEventListener('input', updateOutput);
 cssInput.addEventListener('input', updateOutput);
+lipuceInput.addEventListener('input', updateOutput);
+pageNameInput.addEventListener('input', updateOutput);
+imgInput.addEventListener('change', handleFileInputChange);
+
+archbtn.addEventListener('click', handleDownloadZip);
+cssbtn.addEventListener('click', handleDownloadCSS);
+htmlbtn.addEventListener('click', handleDownloadHTML);
 
 updateOutput();
