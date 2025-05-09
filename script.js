@@ -1,9 +1,7 @@
-// -- IMPORT LIBRARY MARkED --
 const script = document.createElement("script");
 script.src = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
 document.head.appendChild(script);
 
-// -- GLOBAL STYLES & STATE --
 let blockquoteStylesList = [
   `blockquote{border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`,
   `blockquote{position:relative;margin:1em 0;font-style:italic;display:inline;padding-right:.9em;}
@@ -14,9 +12,8 @@ let blockquoteStylesList = [
 let blockquoteStylesToApply = blockquoteStylesList[0];
 let faviconDataUrl = null;
 
-// -- SANITIZE HTML-TAGGED MARKDOWN TEXT --
 function escapeHTML(str) {
-  return str.replace(/[&<>"']/g, function (m) {
+  return str.replace(/[&<>"']/g, function(m) {
     return {
       '&': '&amp;',
       '<': '&lt;',
@@ -27,35 +24,37 @@ function escapeHTML(str) {
   });
 }
 
-// -- MARKDOWN TO HTML CUSTOM PARSER --
 function customMarkdownParse(markdown) {
   markdown = markdown
     .split('\n')
     .map(line => {
-      if (line.startsWith('>')) return `> ${line.slice(1)}`; // quote
-      return line.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // neutralize HTML
+      if (line.startsWith('>')) return `> ${line.slice(1)}`;
+      return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     })
     .join('\n');
   return marked.parse(markdown);
 }
 
-// -- UPDATE OUTPUTS --
+function prefixCss(css) {
+  return css.split('\n').map(l => {
+    let t = l.trim();
+    return t == '' || t.startsWith('@') || t.startsWith('/*') || t.startsWith('//') ? l : l.replace(/^([^{]+)/, s => `#HtmlOutput ${s.trim()}`)
+  }).join('\n');
+}
+
 function updateOutput() {
-  const markdown = document.getElementById("MarkdownInput").value;
-  const css = formatCSS(document.getElementById("CssInput").value);
-  const liPuce = document.getElementById("lipuce").value || "•";
-  const title = document.getElementById("pagename").value || "Projet";
-  const htmlOutput = customMarkdownParse(markdown);
+  const m = document.getElementById("MarkdownInput").value,
+    c = document.getElementById("CssInput").value,
+    h = marked.parse(m, {
+      breaks: true
+    }),
+    f = "#HtmlOutput *{all:revert;}\n" + prefixCss(c);
+  document.getElementById("HtmlOutput").innerHTML = `<style>${f}</style>${h}`;
+  document.getElementById("HtmlCodeOutput").value = formatHtml(h);
+}
 
-  // Render HTML
-  document.getElementById("HtmlOutput").innerHTML = `<style>
-li::marker{content:"${liPuce} "}
-${blockquoteStylesToApply}
-${css}
-</style>${htmlOutput}`;
-
-  // Format & Generate HTML code
-  const formattedHtmlCode = `<!DOCTYPE html>
+// Format & Generate HTML code
+const formattedHtmlCode = `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -72,7 +71,6 @@ ${htmlOutput}
   document.getElementById("HtmlCodeOutput").value = formattedHtmlCode;
 }
 
-// -- CSS FORMATTER --
 function formatCSS(css) {
   return css
     .replace(/;/g, ';\n')
@@ -81,7 +79,6 @@ function formatCSS(css) {
     .trim();
 }
 
-// -- FILE DOWNLOAD HELPERS --
 function downloadFile(filename, content, mime = "text/plain") {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -92,7 +89,6 @@ function downloadFile(filename, content, mime = "text/plain") {
   URL.revokeObjectURL(url);
 }
 
-// -- EXPORT ZIP --
 document.getElementById("archbtn").addEventListener("click", async () => {
   const zip = new JSZip();
   const title = document.getElementById("pagename").value || "Projet";
@@ -106,7 +102,6 @@ document.getElementById("archbtn").addEventListener("click", async () => {
   downloadFile(`${title || "Projet"}.zip`, content, "application/zip");
 });
 
-// -- EXPORT CSS & HTML INDIVIDUELS --
 document.getElementById("cssbtn").addEventListener("click", () => {
   const css = formatCSS(document.getElementById("CssInput").value);
   downloadFile("styles.css", css, "text/css");
@@ -117,7 +112,6 @@ document.getElementById("htmlbtn").addEventListener("click", () => {
   downloadFile("index.html", html, "text/html");
 });
 
-// -- LOGO IMAGE UPLOAD --
 document.getElementById("imginput").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -133,7 +127,6 @@ document.getElementById("imginput").addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
-// -- INIT --
 ["MarkdownInput", "CssInput", "pagename", "lipuce"].forEach(id =>
   document.getElementById(id).addEventListener("input", updateOutput)
 );
