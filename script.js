@@ -17,25 +17,10 @@ const blockquoteStylesList = [
 ];
 
 const codeBlockStyle = `
-code, pre{
-  background-color: #f4f4f4;
-  font-family: monospace;
-}
-code {
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-size: 0.95em;
-}
-pre {
-  padding: 1em;
-  overflow-x: auto;
-  border-radius: 5px;
-}
-pre code {
-  background: none;
-  padding: 0;
-  font-size: inherit;
-}
+code, pre{background-color: #f4f4f4;font-family: monospace;}
+code {padding: 2px 4px;border-radius: 3px;font-size: 0.95em;}
+pre {padding: 1em;overflow-x: auto;border-radius: 5px;}
+pre code {background: none;padding: 0;font-size: inherit;}
 `;
 
 let blockquoteStylesToApply = blockquoteStylesList[0];
