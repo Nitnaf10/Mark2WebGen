@@ -3,13 +3,20 @@ const markdownInput = $('MarkdownInput'), cssInput = $('CssInput'), htmlOutput =
 
 let uploadedLogo = null, uploadedLogoFormat = null;
 
+// Styles CSS
 const blockquoteCSS = `blockquote{position:relative;border-left:5px solid #ccc;padding-left:10px;margin:1em 0;}`;
 const codeCSS = `code,pre{background:#f4f4f4;font-family:monospace}code{padding:2px 4px;border-radius:3px;font-size:0.95em}pre{padding:1em;overflow-x:auto;border-radius:5px}pre code{background:none;padding:0;font-size:inherit}`;
+const lipuceCSS = bullet => bullet ? `
+ul{list-style:none}
+ul li::before{content:'${bullet.replace(/'/g, "\\'")}';margin-right:0.5em}` : '';
 
-function escapeHtml(s) {
-  return s.replace(/[<>"']/g, m => ({ '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-}
+// Fonctions utilitaires
+const escapeHtml = s => s.replace(/[<>"']/g, m => ({ '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const formatHTML = html => html.replace(/></g, '>\n<').replace(/<\/(ul|ol|p)>/g, '</$1>\n').trim();
+const formatCSS = css => css.replace(/\/\*.*?\*\//gs, '').replace(/\s*{\s*/g, ' {\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*}\s*/g, '\n}\n\n').replace(/\n\s*\n/g, '\n').replace(/:\s*/g, ': ').trim();
+const applyPreviewStyles = css => { let style = $('previewStyles'); if (!style) { style = document.createElement('style'); style.id = 'previewStyles'; document.head.appendChild(style); } style.innerHTML = `.output { ${css} }`; };
 
+// Conversion Markdown
 function convertMarkdown(md) {
   return `<p>${escapeHtml(md)
     .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
@@ -35,30 +42,7 @@ function convertMarkdown(md) {
   }</p>`;
 }
 
-function formatHTML(html) {
-  return html.replace(/></g, '>\n<').replace(/<\/(ul|ol|p)>/g, '</$1>\n').trim();
-}
-
-function formatCSS(css) {
-  return css.replace(/\/\*.*?\*\//gs, '')
-            .replace(/\s*{\s*/g, ' {\n  ')
-            .replace(/;\s*/g, ';\n  ')
-            .replace(/\s*}\s*/g, '\n}\n\n')
-            .replace(/\n\s*\n/g, '\n')
-            .replace(/:\s*/g, ': ')
-            .trim();
-}
-
-function applyPreviewStyles(css) {
-  let style = $('previewStyles');
-  if (!style) {
-    style = document.createElement('style');
-    style.id = 'previewStyles';
-    document.head.appendChild(style);
-  }
-  style.innerHTML = `.output { ${css} }`;
-}
-
+// Mise à jour du contenu et application des styles
 function updateOutput() {
   const raw = markdownInput.value, cssRaw = cssInput.value, bullet = lipuceInput.value.trim(), title = pageNameInput.value.trim();
   const html = convertMarkdown(raw);
@@ -67,15 +51,12 @@ function updateOutput() {
 
   let fullCss = formatCSS(cssRaw) + '\n' + blockquoteCSS;
   if (html.includes('<code>')) fullCss += '\n' + codeCSS;
-  if (bullet) {
-    fullCss += `
-ul{list-style:none}
-ul li::before{content:'${bullet.replace(/'/g, "\\'")}';margin-right:0.5em}`;
-  }
+  fullCss += lipuceCSS(bullet);
   applyPreviewStyles(fullCss);
   if (title) document.title = title;
 }
 
+// Gestion du logo téléchargé
 function handleFileInputChange(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -95,6 +76,7 @@ function handleFileInputChange(e) {
   reader.readAsDataURL(file);
 }
 
+// Mise à jour de la favicon
 function updateFavicon(dataUrl) {
   let link = document.querySelector("link[rel~='icon']");
   if (!link) {
@@ -105,6 +87,7 @@ function updateFavicon(dataUrl) {
   link.href = dataUrl;
 }
 
+// Téléchargement de fichier
 function downloadFile(content, name, type) {
   const blob = new Blob([content], { type });
   const a = document.createElement('a');
@@ -113,6 +96,7 @@ function downloadFile(content, name, type) {
   a.click();
 }
 
+// Construction du fichier HTML
 function buildHTMLDocument() {
   const title = pageNameInput.value.trim() || 'Document généré';
   const body = formatHTML(htmlOutput.innerHTML);
@@ -131,6 +115,7 @@ ${body}
 </html>`;
 }
 
+// Gestion des téléchargements
 function handleDownloadHTML() {
   downloadFile(buildHTMLDocument(), 'document.html', 'text/html');
 }
@@ -138,10 +123,7 @@ function handleDownloadHTML() {
 function handleDownloadCSS() {
   let css = formatCSS(cssInput.value) + '\n' + blockquoteCSS;
   if (htmlOutput.innerHTML.includes('<code>')) css += '\n' + codeCSS;
-  const bullet = lipuceInput.value.trim();
-  if (bullet) css += `
-ul{list-style:none}
-ul li::before{content:'${bullet.replace(/'/g, "\\'")}';margin-right:0.5em}`;
+  css += lipuceCSS(lipuceInput.value.trim());
   downloadFile(css, 'styles.css', 'text/css');
 }
 
@@ -151,10 +133,7 @@ function handleDownloadZip() {
 
   let css = formatCSS(cssInput.value) + '\n' + blockquoteCSS;
   if (htmlOutput.innerHTML.includes('<code>')) css += '\n' + codeCSS;
-  const bullet = lipuceInput.value.trim();
-  if (bullet) css += `
-ul{list-style:none}
-ul li::before{content:'${bullet.replace(/'/g, "\\'")}';margin-right:0.5em}`;
+  css += lipuceCSS(lipuceInput.value.trim());
   zip.file('styles.css', css);
 
   if (uploadedLogo) {
