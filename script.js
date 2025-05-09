@@ -54,6 +54,8 @@ function updateOutput() {
 }
 
 // Format & Generate HTML code
+const title = document.getElementById("pagename").value || "Index";
+
 const formattedHtmlCode = `<!DOCTYPE html>
 <html lang="fr">
 <head>
