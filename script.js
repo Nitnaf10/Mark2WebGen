@@ -55,6 +55,8 @@ function updateOutput() {
 
 // Format & Generate HTML code
 const title = document.getElementById("pagename").value || "Index";
+const markdown = document.getElementById("MarkdownInput").value;
+const htmlOutput = marked.parse(markdown);
 
 const formattedHtmlCode = `<!DOCTYPE html>
 <html lang="fr">
@@ -63,14 +65,13 @@ const formattedHtmlCode = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <link rel="stylesheet" href="styles.css" />
-  ${faviconDataUrl ? `<link rel="icon" href="logo.${faviconDataUrl.type.split("/")[1]}" />` : ""}
 </head>
 <body>
 ${htmlOutput}
 </body>
 </html>`.trim();
 
-  document.getElementById("HtmlCodeOutput").value = formattedHtmlCode;
+document.getElementById("HtmlCodeOutput").value = formattedHtmlCode;
 
 function formatCSS(css) {
   return css
