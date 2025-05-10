@@ -39,7 +39,7 @@ function prefixCss(css) {
 }
 
 function getBaseCss() {
-  return `#HtmlOutput *{all:revert;}
+  return `#HtmlOutput{h1,h2,strong,em{all:revert;}}
 #HtmlOutput pre{background:#f5f5f5;padding:1em;overflow:auto;border-radius:5px;font-family:monospace;font-size:.95em;line-height:1.4;margin:1em 0;white-space:pre-wrap;}
 #HtmlOutput code{background:#f0f0f0;padding:.2em .4em;border-radius:3px;font-family:monospace;font-size:.95em;}
 #HtmlOutput pre code{background:none;padding:0;border-radius:0;}`;
