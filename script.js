@@ -47,17 +47,28 @@ function getBaseCss() {
 
 function updateOutput() {
   const renderer = new marked.Renderer();
-  renderer.blockquote = q => `<blockquote>${q}</blockquote>\n`;
-  renderer.listitem = t => `<li>${t}</li>\n`;
-  renderer.paragraph = t => /^(<blockquote>|<pre>|<ul>)/.test(t) ? `${t}\n` : `<p>${t}</p>\n`;
 
-  const m = document.getElementById("MarkdownInput").value,
-        c = document.getElementById("CssInput").value,
-        h = marked.parse(m, { breaks: true, renderer }),
-        f = `${getBaseCss()}\n${prefixCss(c)}\n${blockquoteStylesToApply}`;
-  
-  document.getElementById("HtmlOutput").innerHTML = `<style>${f}</style>${h}`;
-  document.getElementById("HtmlCodeOutput").value = formatHtml(h);
+  renderer.blockquote = function (quote) {
+    return `<blockquote>${quote}</blockquote>\n`;
+  };
+
+  renderer.listitem = function (text) {
+    return `<li>${text}</li>\n`;
+  };
+
+  renderer.paragraph = function (text) {
+    if (/^(<blockquote>|<pre>|<ul>|<ol>)/.test(text.trim())) return `${text}\n`;
+    return `<p>${text}</p>\n`;
+  };
+
+  const markdown = document.getElementById("MarkdownInput").value;
+  const css = document.getElementById("CssInput").value;
+
+  const html = marked.parse(markdown, { breaks: true, renderer: renderer });
+  const fullCss = `${getBaseCss()}\n${prefixCss(css)}\n${blockquoteStylesToApply}`;
+
+  document.getElementById("HtmlOutput").innerHTML = `<style>${fullCss}</style>${html}`;
+  document.getElementById("HtmlCodeOutput").value = formatHtml(html);
 }
 
 function formatHtml(html) {
