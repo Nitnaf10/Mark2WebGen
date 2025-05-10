@@ -46,10 +46,16 @@ function getBaseCss() {
 }
 
 function updateOutput() {
+  const renderer = new marked.Renderer();
+  renderer.blockquote = q => `<blockquote>${q}</blockquote>\n`;
+  renderer.listitem = t => `<li>${t}</li>\n`;
+  renderer.paragraph = t => /^(<blockquote>|<pre>|<ul>)/.test(t) ? `${t}\n` : `<p>${t}</p>\n`;
+
   const m = document.getElementById("MarkdownInput").value,
         c = document.getElementById("CssInput").value,
-        h = marked.parse(m, { breaks: true }),
+        h = marked.parse(m, { breaks: true, renderer }),
         f = `${getBaseCss()}\n${prefixCss(c)}\n${blockquoteStylesToApply}`;
+  
   document.getElementById("HtmlOutput").innerHTML = `<style>${f}</style>${h}`;
   document.getElementById("HtmlCodeOutput").value = formatHtml(h);
 }
