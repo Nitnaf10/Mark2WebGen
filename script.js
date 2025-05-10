@@ -30,12 +30,14 @@ function customMarkdownParse(markdown) {
 }
 
 function prefixCss(css) {
-  return css.split('\n').map(l => {
-    const t = l.trim();
-    return t === '' || t.startsWith('@') || t.startsWith('/*') || t.startsWith('//')
-      ? l
-      : l.replace(/^([^{]+)/, s => `#HtmlOutput ${s.trim()}`);
-  }).join('\n');
+  // Ajoute #HtmlOutput devant chaque sélecteur (supporte multi-sélecteurs séparés par des virgules)
+  return css.replace(/([^\{]+)\{([^}]+)\}/g, (match, selectors, properties) => {
+    const prefixedSelectors = selectors
+      .split(',')
+      .map(s => `#HtmlOutput ${s.trim()}`)
+      .join(', ');
+    return `${prefixedSelectors} {${properties}}`;
+  });
 }
 
 function getBaseCss() {
@@ -55,7 +57,7 @@ function updateOutput() {
 }
 
 function formatHtml(html) {
-  return html.trim(); // ou plus complexe si souhaité
+  return html.trim(); // Peut être enrichi avec un formatteur si besoin
 }
 
 function formatCSS(css) {
