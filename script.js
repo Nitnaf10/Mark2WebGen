@@ -67,9 +67,11 @@ function updateOutput() {
   };
 
   renderer.paragraph = function (text) {
-    if (/^(<blockquote>|<pre>|<ul>|<ol>)/.test(text.trim())) return `${text}\n`;
-    return `<p>${text}</p>\n`;
-  };
+  if (typeof text !== 'string') text = String(text);
+  if (/^(<blockquote>|<pre>|<ul>|<ol>)/.test(text.trim())) return `${text}\n`;
+  return `<p>${text}</p>\n`;
+};
+
 
   const markdown = document.getElementById("MarkdownInput").value;
   const css = document.getElementById("CssInput").value;
