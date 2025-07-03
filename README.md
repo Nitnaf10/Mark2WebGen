@@ -1,6 +1,6 @@
 # Mark2WebGen
 
-[Mark2WebGen](https://nitnaf10.github.io/Portofolio/Mark2WebGen/) est un outil en ligne intuitif qui permet de générer du code HTML à partir de la syntaxe Markdown et de styles CSS personnalisés. Que vous soyez débutant ou expert, cet éditeur facilite la création de contenu web stylisé.
+[Mark2WebGen](https://nitnaf10.github.io/Mark2WebGen/) est un outil en ligne intuitif qui permet de générer du code HTML à partir de la syntaxe Markdown et de styles CSS personnalisés. Que vous soyez débutant ou expert, cet éditeur facilite la création de contenu web stylisé.
 
 ## Fonctionnalités
 
@@ -20,7 +20,7 @@
 
 ## Contact
 
-Pour toute question ou pour voir d'autres projets, visitez mon [profil GitHub](https://github.com/Nitnaf10) ou rejoignez mon serveur Discord [Nitnaf's Tools](https://discord.gg/fD93VcDE5E).
+Pour toute question ou pour voir d'autres projets, visitez mon [profil GitHub](https://github.com/Nitnaf10) ou rejoignez mon serveur Discord [Nitnaf's Tools](https://discord.gg/XVyHTVMwU4).
 
 ## Licence
 
